@@ -244,7 +244,6 @@ const app = {
   projectorBeam: null,
   cinemaLightEntities: [],
   receptionistHead: null,
-  receptionistMouth: null,
   receptionistArms: [],
   audioContext: null,
   masterGain: null,
@@ -520,7 +519,6 @@ function clearScene() {
   app.projectorBeam = null;
   app.cinemaLightEntities = [];
   app.receptionistHead = null;
-  app.receptionistMouth = null;
   app.receptionistArms = [];
   app.seated = false;
   app.seatInProgress = false;
@@ -1158,20 +1156,17 @@ function createReceptionSubtitle(text) {
 }
 
 function animateReceptionistTalking(active) {
-  if (!app.receptionistHead || !app.receptionistMouth) {
+  if (!app.receptionistHead) {
     return;
   }
   if (active) {
     app.receptionistHead.setAttribute("animation__talk", "property: rotation; dir: alternate; dur: 420; loop: true; to: 0 0 4");
-    app.receptionistMouth.setAttribute("animation__mouth", "property: scale; dir: alternate; dur: 180; loop: true; to: 1 2.2 1");
     app.receptionistArms.forEach((arm, index) => {
       arm.setAttribute("animation__talkhand", `property: rotation; dir: alternate; dur: ${380 + index * 70}; loop: true; to: 48 0 ${index === 0 ? -9 : 9}`);
     });
   } else {
     app.receptionistHead.removeAttribute("animation__talk");
-    app.receptionistMouth.removeAttribute("animation__mouth");
     app.receptionistHead.setAttribute("rotation", "0 0 0");
-    app.receptionistMouth.setAttribute("scale", "1 1 1");
     app.receptionistArms.forEach((arm, index) => {
       arm.removeAttribute("animation__talkhand");
       arm.setAttribute("rotation", `58 0 ${index === 0 ? -5 : 5}`);
@@ -1820,11 +1815,6 @@ function createReceptionist(position = "0 1.05 -5.85") {
       material: "color: #101010"
     }, app.receptionistHead);
   }
-  app.receptionistMouth = createEl("a-box", {
-    position: "0 -0.1 0.265",
-    scale: "0.16 0.025 0.02",
-    material: `color: ${palette.white}; opacity: 0.85; transparent: true`
-  }, app.receptionistHead);
   app.receptionistArms = [];
   for (const side of [-1, 1]) {
     const arm = createEl("a-cylinder", {
