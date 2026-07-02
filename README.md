@@ -132,7 +132,9 @@ Les fonctions principales sont dans `script.js` :
 
 - `updateKeyboardMovement(deltaTime)` : deplacement PC dans la direction regardee.
 - `updateVRJoystickMovement(deltaTime)` : deplacement joystick VR si les axes sont disponibles.
-- `createTeleportPoint(position, label, targetPosition)` : teleportation de secours.
+- `movementSettings` et `joystickSettings` : reglages de vitesse, deadzone et inversion, desactives par defaut.
+- `teleportTargets` : carte centralisee des destinations de teleportation.
+- `createTeleportPoint(targetKey)`, `teleportTo(targetKey)`, `faceRigToward()` : teleportation de secours avec orientation vers l'objet logique.
 - `createDialogueBubble()`, `showDialogueNearSpeaker()`, `showMessageNearPlayer()` : dialogues lisibles orientes vers le joueur.
 - `createGuard()`, `animateGuardGreeting()`, `speakGuard()` : deux gardiens devant le cinema.
 - `createReceptionist()`, `speakReceptionist()`, `animateReceptionistTalking()` : receptionniste anime avec voix et sous-titres.
@@ -208,6 +210,7 @@ Controles utiles :
 - `D` : aller a droite.
 - Fleche haut, bas, gauche, droite : memes directions.
 - Points cyan au sol : teleportation rapide vers les zones importantes.
+- Les points cyan orientent aussi la vue vers le comptoir, les posters, les portes ou l'ecran selon la destination.
 - Bouton "Activer le son" : demarre l'audio Web apres une interaction utilisateur, puis devient "Couper le son".
 - Dans la salle : "S'asseoir" deplace la camera vers une place, puis "Lancer la seance" devient disponible.
 
@@ -362,6 +365,8 @@ Pour chaque asset ajoute plus tard, noter :
 - `W` ou `Z` avance vers ce que l'utilisateur regarde.
 - `S` recule, `A` ou `Q` va a gauche, `D` va a droite.
 - Les fleches directionnelles suivent les memes directions.
+- Les teleporteurs envoient vers des destinations centralisees dans `teleportTargets`.
+- Apres teleportation, la vue est orientee vers l'objet attendu.
 - Le joystick VR est teste si un casque compatible est disponible.
 - L'accueil futuriste apparait.
 - Le receptionniste apparait.
@@ -407,8 +412,16 @@ Pour chaque asset ajoute plus tard, noter :
 - Affiches reelles visibles dans la rue et dans l'accueil : OK.
 - Clic sur la porte vers l'accueil : OK.
 - Parametres de deplacement non inverses : `invertForwardBackward = false`, `invertLeftRight = false`.
+- Navigation clavier corrigee et mesuree : `W`/`Z` avance vers `-Z`, `S` recule vers `+Z`, `A`/`Q` va vers `-X`, `D` va vers `+X`.
+- Fleches clavier corrigees et mesurees : haut avance, bas recule, gauche va a gauche, droite va a droite.
+- Test camera tournee : apres rotation de regard vers la droite, `W` avance vers la nouvelle direction regardee.
+- Joystick VR configure avec `deadzone = 0.15`, `speed = 2.0`, `invertX = false`, `invertY = false`.
 - Deplacement du pointeur puis clic sur les affiches et boutons : OK.
 - Points de teleportation visibles et discrets : OK.
+- Teleporteurs accueil verifies : Comptoir, Poster Big Buck Bunny, Poster Sintel, Ecran, Vers salles.
+- Teleporteurs couloir verifies : Debut couloir, Salle 1, Salle 2.
+- Teleporteurs salle verifies : Entree salle, Siege avec hauteur assise `1.2`.
+- Orientation apres teleportation verifiee : comptoir face receptionniste, posters face affiches, portes face salles, siege face ecran.
 - Clic sur l'affiche Big Buck Bunny : OK, bande-annonce reelle `film1-trailer.mp4` visible.
 - Ticket Big Buck Bunny vers Salle 1 : OK.
 - Bouton "Aller vers les salles" lisible apres generation du ticket : OK.

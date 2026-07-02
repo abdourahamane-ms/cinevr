@@ -38,6 +38,13 @@ const movementSettings = {
   invertLeftRight: false
 };
 
+const joystickSettings = {
+  deadzone: 0.15,
+  speed: 2.0,
+  invertY: false,
+  invertX: false
+};
+
 const receptionistSpeech =
   "Bonjour et bienvenue au CineVR. Aujourd'hui, deux films sont disponibles. Vous pouvez choisir librement le film que vous voulez voir. Cliquez sur une affiche pour voir sa description et sa bande-annonce. Apres votre choix, je vous donnerai votre ticket.";
 
@@ -53,10 +60,10 @@ const sceneLayouts = {
     rightGuard: { position: "1.85 0 -3.85", rotation: "0 -12 0" },
     soundButton: { position: "-5.55 1.15 -2.65", rotation: "0 28 0" },
     teleportPoints: [
-      { position: "0 0.03 5.4", label: "Vue facade", target: "0 1.6 5.4" },
-      { position: "-1.85 0.03 -2.65", label: "Gardien G", target: "-1.85 1.6 -2.65" },
-      { position: "1.85 0.03 -2.65", label: "Gardien D", target: "1.85 1.6 -2.65" },
-      { position: "0 0.03 -2.4", label: "Entree", target: "0 1.6 -2.4" }
+      "streetFacade",
+      "streetGuardLeft",
+      "streetGuardRight",
+      "streetEntrance"
     ]
   },
   lobby: {
@@ -72,11 +79,12 @@ const sceneLayouts = {
     receptionDesk: { position: "0 0.58 -5.35", rotation: "0 0 0" },
     receptionist: { position: "0 0.72 -4.88", rotation: "0 0 0" },
     teleportPoints: [
-      { position: "0 0.035 3.5", label: "Accueil", target: "0 1.6 3.5" },
-      { position: "-3.25 0.035 -1.0", label: "Poster 1", target: "-3.25 1.6 -1.0" },
-      { position: "3.25 0.035 -1.0", label: "Poster 2", target: "3.25 1.6 -1.0" },
-      { position: "0 0.035 0.75", label: "Preview", target: "0 1.6 0.75" },
-      { position: "0 0.035 -3.45", label: "Comptoir", target: "0 1.6 -3.45" }
+      "lobbyCenter",
+      "lobbyPosterLeft",
+      "lobbyPosterRight",
+      "lobbyPreview",
+      "lobbyDesk",
+      "lobbyExit"
     ]
   },
   hallway: {
@@ -85,20 +93,103 @@ const sceneLayouts = {
     room1Door: { position: "-4.85 1.35 -1.85", rotation: "0 90 0" },
     room2Door: { position: "4.85 1.35 -1.85", rotation: "0 -90 0" },
     teleportPoints: [
-      { position: "0 0.035 3.4", label: "Debut", target: "0 1.6 3.4" },
-      { position: "0 0.035 0.5", label: "Ticket", target: "0 1.6 0.5" },
-      { position: "-2.8 0.035 -1.85", label: "Salle 1", target: "-2.8 1.6 -1.85" },
-      { position: "2.8 0.035 -1.85", label: "Salle 2", target: "2.8 1.6 -1.85" }
+      "hallwayStart",
+      "hallwayTicket",
+      "hallwayRoom1",
+      "hallwayRoom2"
     ]
   },
   cinemaRoom: {
     cameraStart: { position: "0 1.6 6.2", rotation: "0 0 0" },
     screen: { position: "0 2.65 -7.2", rotation: "0 0 0" },
     seatTarget: { position: "0 1.2 0.35", rotation: "0 0 0" },
-    entryTeleport: { position: "0 0.035 4.85", label: "Entree", target: "0 1.6 4.85" },
-    seatTeleport: { position: "0 0.035 0.35", label: "Place", target: "0 1.2 0.35" },
     rows: 4,
     seatsPerSide: 3
+  }
+};
+
+const teleportTargets = {
+  streetFacade: {
+    label: "Vue facade",
+    position: { x: 0, y: 0, z: 5.4 },
+    lookAt: { x: 0, y: 1.8, z: -5.6 }
+  },
+  streetEntrance: {
+    label: "Entree cinema",
+    position: { x: 0, y: 0, z: -2.4 },
+    lookAt: { x: 0, y: 1.6, z: -5.8 }
+  },
+  streetGuardLeft: {
+    label: "Gardien gauche",
+    position: { x: -1.85, y: 0, z: -2.6 },
+    lookAt: { x: -1.85, y: 1.45, z: -3.85 }
+  },
+  streetGuardRight: {
+    label: "Gardien droit",
+    position: { x: 1.85, y: 0, z: -2.6 },
+    lookAt: { x: 1.85, y: 1.45, z: -3.85 }
+  },
+  lobbyCenter: {
+    label: "Accueil",
+    position: { x: 0, y: 0, z: 3.5 },
+    lookAt: { x: 0, y: 1.7, z: -5.0 }
+  },
+  lobbyDesk: {
+    label: "Comptoir",
+    position: { x: 0, y: 0, z: -3.45 },
+    lookAt: { x: 0, y: 1.65, z: -4.9 }
+  },
+  lobbyPosterLeft: {
+    label: "Poster Big Buck Bunny",
+    position: { x: -3.25, y: 0, z: -0.95 },
+    lookAt: { x: -4.65, y: 1.75, z: -2.45 }
+  },
+  lobbyPosterRight: {
+    label: "Poster Sintel",
+    position: { x: 3.25, y: 0, z: -0.95 },
+    lookAt: { x: 4.65, y: 1.75, z: -2.45 }
+  },
+  lobbyPreview: {
+    label: "Ecran",
+    position: { x: 0, y: 0, z: -2.25 },
+    lookAt: { x: 0, y: 2.2, z: -6.45 }
+  },
+  lobbyExit: {
+    label: "Vers salles",
+    position: { x: 2.85, y: 0, z: 2.25 },
+    lookAt: { x: 2.85, y: 1.35, z: 1.45 }
+  },
+  hallwayStart: {
+    label: "Debut couloir",
+    position: { x: 0, y: 0, z: 3.4 },
+    lookAt: { x: 0, y: 1.6, z: -3.0 }
+  },
+  hallwayTicket: {
+    label: "Ticket",
+    position: { x: 0, y: 0, z: 0.5 },
+    lookAt: { x: 0, y: 2.2, z: 1.4 }
+  },
+  hallwayRoom1: {
+    label: "Salle 1",
+    position: { x: -2.8, y: 0, z: -1.85 },
+    lookAt: { x: -4.85, y: 1.35, z: -1.85 }
+  },
+  hallwayRoom2: {
+    label: "Salle 2",
+    position: { x: 2.8, y: 0, z: -1.85 },
+    lookAt: { x: 4.85, y: 1.35, z: -1.85 }
+  },
+  cinemaEntrance: {
+    label: "Entree salle",
+    position: { x: 0, y: 0, z: 4.85 },
+    lookAt: { x: 0, y: 2.2, z: -7.2 }
+  },
+  cinemaSeat: {
+    label: "Siege",
+    position: { x: 0, y: 0, z: 0.35 },
+    lookAt: { x: 0, y: 2.2, z: -7.2 },
+    cameraHeight: 1.2,
+    seated: true
   }
 };
 
@@ -292,23 +383,22 @@ function updateVRJoystickMovement(deltaTime) {
     return;
   }
   const gamepads = Array.from(navigator.getGamepads()).filter(Boolean);
-  const deadZone = 0.18;
   for (const gamepad of gamepads) {
     if (!gamepad.axes || gamepad.axes.length < 2) continue;
-    const axisX = Math.abs(gamepad.axes[2] || 0) > deadZone || Math.abs(gamepad.axes[3] || 0) > deadZone
+    const axisX = Math.abs(gamepad.axes[2] || 0) > joystickSettings.deadzone || Math.abs(gamepad.axes[3] || 0) > joystickSettings.deadzone
       ? gamepad.axes[2]
       : gamepad.axes[0];
-    const axisY = Math.abs(gamepad.axes[2] || 0) > deadZone || Math.abs(gamepad.axes[3] || 0) > deadZone
+    const axisY = Math.abs(gamepad.axes[2] || 0) > joystickSettings.deadzone || Math.abs(gamepad.axes[3] || 0) > joystickSettings.deadzone
       ? gamepad.axes[3]
       : gamepad.axes[1];
-    const x = Math.abs(axisX || 0) > deadZone ? axisX : 0;
-    const y = Math.abs(axisY || 0) > deadZone ? axisY : 0;
+    const x = Math.abs(axisX || 0) > joystickSettings.deadzone ? axisX : 0;
+    const y = Math.abs(axisY || 0) > joystickSettings.deadzone ? axisY : 0;
     if (!x && !y) continue;
     let forwardAmount = -y;
     let rightAmount = x;
-    if (movementSettings.invertForwardBackward) forwardAmount *= -1;
-    if (movementSettings.invertLeftRight) rightAmount *= -1;
-    moveCameraRig(forwardAmount, rightAmount, deltaTime, movementSettings.speed * 0.82);
+    if (joystickSettings.invertY) forwardAmount *= -1;
+    if (joystickSettings.invertX) rightAmount *= -1;
+    moveCameraRig(forwardAmount, rightAmount, deltaTime, joystickSettings.speed);
     break;
   }
 }
@@ -320,6 +410,10 @@ function moveCameraRig(forwardAmount, rightAmount, deltaTime, speed) {
   const THREE = AFRAME.THREE;
   const forward = new THREE.Vector3();
   app.camera.object3D.getWorldDirection(forward);
+  // In this A-Frame setup getWorldDirection points along the camera object's +Z axis,
+  // which is the opposite of the visual viewing direction. Negate once, then derive
+  // right/left from that corrected forward vector.
+  forward.negate();
   forward.y = 0;
   if (forward.lengthSq() < 0.0001) {
     return;
@@ -608,68 +702,117 @@ async function applyPosterImageIfAvailable(movie, posterSurface) {
   posterSurface.setAttribute("material", `shader: flat; src: #${image.id}; color: #ffffff; side: double`);
 }
 
-function createTeleportPoint(position, label, targetPosition) {
-  const point = createGroup({ position });
+function getTeleportTarget(targetKey) {
+  if (typeof targetKey === "string") {
+    return teleportTargets[targetKey] ? { ...teleportTargets[targetKey], key: targetKey } : null;
+  }
+  if (targetKey && targetKey.position && targetKey.lookAt) {
+    return targetKey;
+  }
+  return null;
+}
+
+function createTeleportPoint(targetKey) {
+  const target = getTeleportTarget(targetKey);
+  if (!target) {
+    return null;
+  }
+  const point = createGroup({ position: `${target.position.x} 0.035 ${target.position.z}` });
   createEl(
     "a-cylinder",
     {
-      radius: 0.22,
-      height: 0.025,
+      radius: 0.16,
+      height: 0.018,
       position: "0 0 0",
-      material: `color: ${palette.cyan}; emissive: ${palette.cyan}; emissiveIntensity: 0.42; opacity: 0.34; transparent: true`
+      material: `color: ${palette.cyan}; emissive: ${palette.cyan}; emissiveIntensity: 0.32; opacity: 0.24; transparent: true`
     },
     point
   );
   createEl(
     "a-ring",
     {
-      "radius-inner": 0.11,
-      "radius-outer": 0.17,
+      "radius-inner": 0.075,
+      "radius-outer": 0.12,
       rotation: "-90 0 0",
-      position: "0 0.025 0",
-      material: `color: ${palette.white}; emissive: ${palette.cyan}; emissiveIntensity: 0.42; opacity: 0.58; transparent: true`
+      position: "0 0.02 0",
+      material: `color: ${palette.white}; emissive: ${palette.cyan}; emissiveIntensity: 0.35; opacity: 0.48; transparent: true`
     },
     point
   );
   createText(
-    label,
+    target.label,
     {
-      position: "0 0.04 0.3",
+      position: "0 0.035 0.25",
       rotation: "-90 0 0",
       color: palette.white,
-      width: 0.55,
-      "wrap-count": 10
+      width: 0.72,
+      "wrap-count": 14
     },
     point
   );
   const hit = createEl(
     "a-cylinder",
     {
-      radius: 0.32,
+      radius: 0.25,
       height: 0.04,
       position: "0 0.02 0",
       material: "color: #ffffff; opacity: 0.001; transparent: true"
     },
     point
   );
-  makeClickable(hit, () => teleportTo(targetPosition, label), point);
+  makeClickable(hit, () => teleportTo(target.key || targetKey), point);
   return point;
 }
 
 function addTeleportPoints(points) {
-  points.forEach((point) => createTeleportPoint(point.position, point.label, point.target));
+  points.forEach((targetKey) => createTeleportPoint(targetKey));
 }
 
-function teleportTo(targetPosition, label = "point") {
+function lookAtTarget(targetPosition, fromPosition = null) {
+  const from = fromPosition || app.cameraRig.object3D.position;
   const target = parsePosition(targetPosition);
+  const dx = target.x - from.x;
+  const dz = target.z - from.z;
+  const yaw = AFRAME.THREE.MathUtils.radToDeg(Math.atan2(-dx, -dz));
+  return `0 ${yaw.toFixed(2)} 0`;
+}
+
+function faceRigToward(targetLookAt, fromPosition = null) {
+  if (!app.cameraRig || !targetLookAt) {
+    return;
+  }
+  const rotation = lookAtTarget(targetLookAt, fromPosition);
+  app.cameraRig.setAttribute("animation__teleportrot", {
+    property: "rotation",
+    dur: 420,
+    easing: "easeInOutSine",
+    to: rotation
+  });
+  app.camera.setAttribute("rotation", "0 0 0");
+}
+
+function teleportTo(targetKey) {
+  const target = getTeleportTarget(targetKey);
+  if (!target) {
+    showMessage("Destination de teleportation introuvable.");
+    return;
+  }
+  const cameraHeight = target.cameraHeight || (app.seated ? 1.2 : 1.6);
+  const rigTarget = { x: target.position.x, y: cameraHeight, z: target.position.z };
+  if (target.seated) {
+    app.seated = true;
+    if (app.sitButton) app.sitButton.setAttribute("visible", "false");
+    if (app.launchButton && !movieStarted) app.launchButton.setAttribute("visible", "true");
+  }
   playValidationSound();
   app.cameraRig.setAttribute("animation__teleport", {
     property: "position",
     dur: 450,
     easing: "easeInOutSine",
-    to: `${target.x} ${target.y} ${target.z}`
+    to: `${rigTarget.x} ${rigTarget.y} ${rigTarget.z}`
   });
-  showMessage(`Teleportation : ${label}`);
+  faceRigToward(target.lookAt, rigTarget);
+  showMessage(`Deplacement : ${target.label}`);
 }
 
 function getPlayerWorldPosition() {
@@ -2323,7 +2466,7 @@ function showCinemaRoomScene(movie = selectedMovie) {
   createProjector();
   createSeatRows();
   createAudience();
-  addTeleportPoints([sceneLayouts.cinemaRoom.entryTeleport, sceneLayouts.cinemaRoom.seatTeleport]);
+  addTeleportPoints(["cinemaEntrance", "cinemaSeat"]);
   createCinemaControls(movie);
   createSoundButtons("-4.55 1.05 4.65", "0 36 0");
 }
