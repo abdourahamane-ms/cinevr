@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CineVR - Cinema virtuel WebXR</title>
+    <meta
+      name="description"
+      content="CineVR est une experience de cinema virtuel en A-Frame et WebXR, compatible ordinateur et casque VR."
+    >
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <noscript>
+      CineVR a besoin de JavaScript pour afficher l'experience VR interactive.
+    </noscript>
+
+    <div id="loading-screen" aria-live="polite">
+      <strong>CineVR</strong>
+      <span>Chargement de la scene WebXR...</span>
+    </div>
+
+    <a-scene
+      id="scene"
+      background="color: #05070c"
+      renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true"
+      vr-mode-ui="enabled: true"
+      xr-mode-ui="enabled: true"
+      cursor="rayOrigin: mouse"
+      raycaster="objects: .clickable"
+    >
+      <a-assets id="asset-library" timeout="10000"></a-assets>
+
+      <a-entity id="camera-rig" position="0 1.6 6" rotation="0 180 0">
+        <a-camera id="camera" position="0 0 0" look-controls="pointerLockEnabled: false" wasd-controls-enabled="false">
+          <a-cursor
+            id="center-cursor"
+            fuse="false"
+            raycaster="objects: .clickable"
+            geometry="primitive: ring; radiusInner: 0.012; radiusOuter: 0.02"
+            material="color: #f7d85c; shader: flat; opacity: 0.95"
+          ></a-cursor>
+        </a-camera>
+        <a-entity
+          laser-controls="hand: left"
+          raycaster="objects: .clickable"
+          line="color: #57d7ff; opacity: 0.75"
+        ></a-entity>
+        <a-entity
+          laser-controls="hand: right"
+          raycaster="objects: .clickable"
+          line="color: #f7d85c; opacity: 0.85"
+        ></a-entity>
+      </a-entity>
+
+      <a-entity id="world"></a-entity>
+    </a-scene>
+
+    <script src="script.js"></script>
+  </body>
+</html>
